@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>CSV Upload & Deduplication</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 30px;
+      }
+      ul {
+        list-style: none;
+        padding-left: 0;
+      }
+      li {
+        margin-bottom: 10px;
+      }
+      button {
+        margin-left: 5px;
+      }
+      select {
+        margin: 10px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Upload Original File</h2>
+    <form action="/uploadOriginal" method="POST" enctype="multipart/form-data">
+      <input type="file" name="originalFile" required />
+      <button type="submit">Upload</button>
+    </form>
+
+    <h2>Upload Old File</h2>
+    <form action="/uploadOld" method="POST" enctype="multipart/form-data">
+      <input type="file" name="oldFile" required />
+      <button type="submit">Upload</button>
+    </form>
+
+    <h3>Uploaded Files:</h3>
+    <ul>
+      <% files.forEach(file => { %>
+      <li>
+        <%= file %>
+
+        <!-- Delete Button -->
+        <form action="/deleteFile" method="POST" style="display: inline">
+          <input type="hidden" name="filename" value="<%= file %>" />
+          <button type="submit">Delete</button>
+        </form>
+
+        <!-- Select Column Button -->
+        <form action="/selectFile" method="POST" style="display: inline">
+          <input type="hidden" name="filename" value="<%= file %>" />
+          <button type="submit">Select Column</button>
+        </form>
+      </li>
+      <% }) %>
+    </ul>
+
+    <% if (columns) { %>
+    <hr />
+    <h3>Select Column to Remove Duplicate from: <%= selectedFile %></h3>
+    <form action="/removeDuplicate" method="POST">
+      <input type="hidden" name="filename" value="<%= selectedFile %>" />
+      <select name="column" required>
+        <% columns.forEach(col => { %>
+        <option value="<%= col %>"><%= col %></option>
+        <% }) %>
+      </select>
+      <button type="submit">Remove Duplicate</button>
+    </form>
+    <% } %> <% if (deduplicatedFileName) { %>
+    <hr />
+    <h3>Duplicate Removed Successfully!</h3>
+    <a href="/uploads/<%= deduplicatedFileName %>" download>
+      <button>⬇️ Download Deduplicated File</button>
+    </a>
+    <% } %>
+  </body>
+</html>
